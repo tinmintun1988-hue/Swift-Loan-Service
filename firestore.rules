@@ -1,0 +1,106 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: /users/{userId}
+    // Fields:
+    //   - userId: string (required)
+    //   - settings: map (required) - contains business settings
+    //
+    // Collection: /users/{userId}/customers/{customerId}
+    // Fields:
+    //   - id: number (legacy ID)
+    //   - name: string (required, < 100 chars)
+    //   - phone: string (< 20 chars)
+    //   - email: string (email format)
+    //   - notes: string (< 1000 chars)
+    //   - createdAt: string (ISO date)
+    //   - createdBy: string (matches auth.uid)
+    //
+    // Collection: /users/{userId}/loans/{loanId}
+    // Fields:
+    //   - id: number (legacy ID)
+    //   - customerId: number
+    //   - date: string (ISO date)
+    //   - loanAmount: number
+    //   - repayAmount: number
+    //   - type: string
+    //   - notes: string (< 1000 chars)
+    //   - createdBy: string (matches auth.uid)
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidDateString(dateStr) {
+      return dateStr is string && dateStr.matches("^\\d{4}-\\d{2}-\\d{2}.*");
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['userId', 'settings']) &&
+             data.userId == request.auth.uid &&
+             data.settings is map;
+    }
+
+    function isValidCustomer(data) {
+      return data.keys().hasAll(['name', 'createdBy']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             (!('email' in data) || data.email == "" || isValidEmail(data.email)) &&
+             (!('phone' in data) || data.phone is string) &&
+             data.createdBy == request.auth.uid;
+    }
+
+    function isValidLoan(data) {
+      return data.keys().hasAll(['customerId', 'date', 'createdBy']) &&
+             data.customerId is number &&
+             isValidDateString(data.date) &&
+             data.loanAmount is number &&
+             data.repayAmount is number &&
+             data.createdBy == request.auth.uid;
+    }
+
+    // ===============================================================
+    // Match Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+      allow delete: if false; // Users shouldn't delete their root config
+
+      match /customers/{customerId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidCustomer(request.resource.data);
+        allow update: if isOwner(userId) && isValidCustomer(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      match /loans/{loanId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidLoan(request.resource.data);
+        allow update: if isOwner(userId) && isValidLoan(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User specific settings and profile data",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "settings": { "$ref": "Settings" }
+      },
+      "required": ["userId", "settings"]
+    },
+    "Settings": {
+      "title": "Application Settings",
+      "description": "Global interest rates and business info",
+      "type": "object",
+      "properties": {
+        "interestRate": { "type": "number" },
+        "penaltyRate": { "type": "number" },
+        "discount": { "type": "number" },
+        "expireDays": { "type": "number" },
+        "method": { "type": "string", "enum": ["flat", "compound", "penalty"] },
+        "bank": { "type": "string" },
+        "account": { "type": "string" },
+        "holder": { "type": "string" },
+        "pin": { "type": "string" },
+        "lang": { "type": "string", "enum": ["en", "my"] },
+        "theme": { "type": "string", "enum": ["light", "dark"] },
+        "qrImage": { "type": "string" },
+        "logoImage": { "type": "string" }
+      }
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Borrower details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "number" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "createdBy": { "type": "string" }
+      },
+      "required": ["name", "createdBy"]
+    },
+    "LoanEntry": {
+      "title": "Loan Entry",
+      "description": "A single loan or repayment transaction",
+      "type": "object",
+      "properties": {
+        "id": { "type": "number" },
+        "customerId": { "type": "number" },
+        "date": { "type": "string" },
+        "loanAmount": { "type": "number" },
+        "repayAmount": { "type": "number" },
+        "type": { "type": "string" },
+        "notes": { "type": "string" },
+        "createdBy": { "type": "string" }
+      },
+      "required": ["customerId", "date", "createdBy"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Individual user settings"
+    },
+    "/users/{userId}/customers/{customerId}": {
+      "schema": "Customer",
+      "description": "Customers belonging to a specific user"
+    },
+    "/users/{userId}/loans/{loanId}": {
+      "schema": "LoanEntry",
+      "description": "Loan records belonging to a specific user"
+    }
+  }
+}

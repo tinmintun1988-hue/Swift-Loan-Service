@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --color-primary: #4F46E5;
+  --color-primary-hover: #4338CA;
+  --color-primary-light: #EEF2FF;
+  --color-text-main: #1A1F36;
+  --color-text-muted: #64748B;
+  --color-bg-main: #F0F2F5;
+  --color-border-main: #E2E8F0;
+
+  /* Force HEX for common colors to avoid oklch errors in PDF generation */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-400: #fbbf24;
+  --color-amber-600: #d97706;
+  
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+}
+
+.dark {
+  --color-bg-main: #0F172A;
+  --color-text-main: #F8FAFC;
+  --color-text-muted: #94A3B8;
+  --color-border-main: #1E293B;
+  --color-white: #1E293B;
+  --color-gray-50: #0F172A;
+  --color-gray-100: #1E293B;
+  --color-gray-200: #334155;
+  --color-gray-300: #475569;
+  --color-gray-400: #64748B;
+  --color-gray-500: #94A3B8;
+  --color-gray-600: #CBD5E1;
+  --color-gray-700: #E2E8F0;
+  --color-gray-800: #F1F5F9;
+  --color-gray-900: #F8FAFC;
+  
+  --color-primary-light: #1E293B;
+}
+
+@layer base {
+  body {
+    @apply bg-bg-main text-text-main antialiased min-h-screen transition-colors duration-200;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white dark:bg-slate-800 border border-border-main/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)];
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-hover shadow-sm;
+  }
+  .btn-outline {
+    @apply border border-border-main dark:border-slate-700 bg-white dark:bg-slate-800 text-text-muted hover:text-text-main hover:bg-gray-50 dark:hover:bg-slate-700;
+  }
+  .btn-danger {
+    @apply text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20;
+  }
+  .input {
+    @apply w-full px-4 py-2.5 border border-border-main dark:border-slate-700 rounded-lg focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all bg-white dark:bg-slate-900 text-text-main;
+  }
+  .badge {
+    @apply inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider;
+  }
+}
